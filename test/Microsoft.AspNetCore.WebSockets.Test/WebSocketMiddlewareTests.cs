@@ -6,6 +6,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Server.IntegrationTesting.Common;
 using Microsoft.AspNetCore.Testing.xunit;
 using Microsoft.Extensions.Logging.Testing;
 using Xunit;
@@ -23,10 +24,13 @@ namespace Microsoft.AspNetCore.WebSockets.Test
 #endif
     public class WebSocketMiddlewareTests : LoggedTest
     {
-        private static string ClientAddress = "ws://localhost:54321/";
+        private readonly int ClientPort;
+        private readonly string ClientAddress;
 
         public WebSocketMiddlewareTests(ITestOutputHelper output) : base(output)
         {
+            ClientPort = TestUriHelper.GetNextPort();
+            ClientAddress = $"ws://localhost:{ClientPort}/";
         }
 
         [ConditionalFact]
@@ -38,7 +42,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                 {
                     Assert.True(context.WebSockets.IsWebSocketRequest);
                     var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -58,7 +63,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.True(context.WebSockets.IsWebSocketRequest);
                     Assert.Equal("alpha, bravo, charlie", context.Request.Headers["Sec-WebSocket-Protocol"]);
                     var webSocket = await context.WebSockets.AcceptWebSocketAsync("Bravo");
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -94,7 +100,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.True(result.EndOfMessage);
                     Assert.Equal(0, result.Count);
                     Assert.Equal(WebSocketMessageType.Binary, result.MessageType);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -123,7 +130,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(orriginalData.Length, result.Count);
                     Assert.Equal(WebSocketMessageType.Binary, result.MessageType);
                     Assert.Equal(orriginalData, serverBuffer);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -151,7 +159,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(orriginalData.Length, result.Count);
                     Assert.Equal(WebSocketMessageType.Binary, result.MessageType);
                     Assert.Equal(orriginalData, serverBuffer);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -191,7 +200,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(WebSocketMessageType.Text, result.MessageType);
 
                     Assert.Equal(orriginalData, serverBuffer);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -235,7 +245,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(WebSocketMessageType.Binary, result.MessageType);
 
                     Assert.Equal(orriginalData, serverBuffer);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -260,7 +271,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     var webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
                     await webSocket.SendAsync(new ArraySegment<byte>(orriginalData), WebSocketMessageType.Binary, true, CancellationToken.None);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -288,7 +300,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     var webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
                     await webSocket.SendAsync(new ArraySegment<byte>(orriginalData), WebSocketMessageType.Binary, true, CancellationToken.None);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -316,7 +329,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     var webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
                     await webSocket.SendAsync(new ArraySegment<byte>(orriginalData), WebSocketMessageType.Binary, true, CancellationToken.None);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -354,7 +368,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     await webSocket.SendAsync(new ArraySegment<byte>(orriginalData, 0, 2), WebSocketMessageType.Binary, false, CancellationToken.None);
                     await webSocket.SendAsync(new ArraySegment<byte>(orriginalData, 2, 2), WebSocketMessageType.Binary, false, CancellationToken.None);
                     await webSocket.SendAsync(new ArraySegment<byte>(orriginalData, 4, 7), WebSocketMessageType.Binary, true, CancellationToken.None);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -404,7 +419,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(WebSocketMessageType.Close, result.MessageType);
                     Assert.Equal(WebSocketCloseStatus.NormalClosure, result.CloseStatus);
                     Assert.Equal(closeDescription, result.CloseStatusDescription);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -429,7 +445,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     var webSocket = await context.WebSockets.AcceptWebSocketAsync();
 
                     await webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, closeDescription, CancellationToken.None);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -468,7 +485,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(closeDescription, result.CloseStatusDescription);
 
                     await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -501,7 +519,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(closeDescription, result.CloseStatusDescription);
 
                     await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
@@ -536,7 +555,8 @@ namespace Microsoft.AspNetCore.WebSockets.Test
                     Assert.Equal(WebSocketMessageType.Close, result.MessageType);
                     Assert.Equal(WebSocketCloseStatus.NormalClosure, result.CloseStatus);
                     Assert.Equal(closeDescription, result.CloseStatusDescription);
-                }))
+                },
+                ClientPort))
                 {
                     using (var client = new ClientWebSocket())
                     {
