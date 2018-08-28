@@ -20,8 +20,8 @@ cd .python
 curl -OL https://pypi.python.org/packages/d4/0c/9840c08189e030873387a73b90ada981885010dd9aea134d6de30cd24cb8/virtualenv-15.1.0.tar.gz
 
 # Validate checksum
-expected=02f8102c2436bb03b3ee6dede1919d1dac8a427541652e5ec95171ec8adbc93a
-actual=$(sha256sum -b virtualenv-15.1.0.tar.gz | cut -d' ' -f1)
+expected=995ce0fa007210ac2f10258999d06813ecdd6eeb
+actual=$(sha1sum -b virtualenv-15.1.0.tar.gz | cut -d' ' -f1)
 if [ "$expected" != "$actual" ]; then
     echo "The checksum for the virtualenv package does not match the expected value." 1>&2
     echo "This can often happen if the download site is down. Try restarting the build." 1>&2
